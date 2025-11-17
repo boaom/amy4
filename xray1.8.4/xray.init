@@ -1,0 +1,133 @@
+#!/bin/sh
+
+#chkconfig: 2345 99 99
+### BEGIN INIT INFO
+# Provides:          xray
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start xray daemon at boot time
+# Description:       Start xray daemon at boot time
+### END INIT INFO
+START=99
+EXTRA_COMMANDS="status"
+
+usage()
+{
+	if type systemctl && [ -z "$(systemctl --failed|grep -q 'Host is down')" ]; then
+		us="systemctl [start|stop|status|restart] xray.service"
+	else
+		if [ "$0" = '/etc/rc.common' ]; then
+			us="/etc/init.d/xray [start|stop|status|restart]"\
+		else
+			us="$0 [start|stop|status|restart]"
+		fi
+	fi &>/dev/null
+	echo "Usage:
+	$us
+	Config file is [xray_install_directory]/xray.json"
+} 2>/dev/null
+
+status()
+{
+	grep -q xray /proc/`cat [xray_install_directory]/run.pid`/comm && \
+		echo "xray is running..." || \
+		echo "xray is stopped..."
+} 2>/dev/null
+
+start()
+{
+	status | grep "xray is running..." && return 0
+	echo -n "Starting xray:"
+	echo 3 >/proc/sys/net/ipv4/tcp_fastopen
+	ulimit -n 1048576
+	cd "[xray_install_directory]"
+	(while :; do
+		./xray run -config xray.json &
+		echo $! >[xray_install_directory]/run.pid
+		sleep 3
+		while grep -q xray /proc/`cat [xray_install_directory]/run.pid`/comm; do
+			sleep 3
+		done
+	done >/dev/null &
+	echo $! >[xray_install_directory]/drun.pid)
+	count=0
+	while [ ! -f "[xray_install_directory]/run.pid" ] && [ "$count" -le 5 ]; do
+		sleep 1
+		count=$((count + 1))
+	done
+	sleep 1
+	for server_port in [xray_tcp_port_list]; do
+		iptables -I INPUT -p 6 --dport $server_port -j ACCEPT
+		ip6tables -I INPUT -p 6 --dport $server_port -j ACCEPT
+	done
+	for server_port in [xray_udp_port_list]; do
+		iptables -I INPUT -p 17 --dport $server_port -j ACCEPT
+		ip6tables -I INPUT -p 17 --dport $server_port -j ACCEPT
+	done
+	grep -q xray /proc/`cat [xray_install_directory]/run.pid`/comm && \
+		echo -e "\033[60G[\033[32m  OK  \033[0m]" || \
+		echo -e "\033[60G[\033[31mFAILED\033[0m]"
+} 2>/dev/null
+
+stop()
+{
+	for server_port in [xray_tcp_port_list]; do
+		iptables -D INPUT -p 6 --dport $server_port -j ACCEPT
+		ip6tables -D INPUT -p 6 --dport $server_port -j ACCEPT
+	done
+	for server_port in [xray_udp_port_list]; do
+		iptables -D INPUT -p 17 --dport $server_port -j ACCEPT
+		ip6tables -D INPUT -p 17 --dport $server_port -j ACCEPT
+	done
+	status | grep "xray is stopped..." && return 0
+	echo -n "Stopping xray:"
+	kill -9 `cat [xray_install_directory]/drun.pid`
+	kill -9 `cat [xray_install_directory]/run.pid`
+	sleep 1
+	grep -q xray /proc/`cat [xray_install_directory]/run.pid`/comm && \
+		echo -e "\033[60G[\033[31mFAILED\033[0m]" || \
+		echo -e "\033[60G[\033[32m  OK  \033[0m]"
+} 2>/dev/null
+
+restart()
+{
+	stop
+	start
+} 2>/dev/null
+
+systemdStart()
+{
+	status | grep running && return 0
+	cd "[xray_install_directory]"
+	for server_port in [xray_tcp_port_list]; do
+		iptables -I INPUT -p 6 --dport $server_port -j ACCEPT
+		ip6tables -I INPUT -p 6 --dport $server_port -j ACCEPT
+	done
+	for server_port in [xray_udp_port_list]; do
+		iptables -I INPUT -p 17 --dport $server_port -j ACCEPT
+		ip6tables -I INPUT -p 17 --dport $server_port -j ACCEPT
+	done
+	ulimit -n 1048576
+	cd "[xray_install_directory]"
+	(while :; do
+		./xray run -config xray.json &
+		echo $! >[xray_install_directory]/run.pid
+		sleep 3
+		while grep -q xray /proc/`cat [xray_install_directory]/run.pid`/comm; do
+			sleep 3
+		done
+	done >/dev/null &
+	echo $! >[xray_install_directory]/drun.pid)
+} 2>/dev/null
+
+systemdRestart()
+{
+	stop
+	systemdStart
+} 2>/dev/null
+
+if [ -z "$initscript" ]; then
+	${1:-usage}
+fi

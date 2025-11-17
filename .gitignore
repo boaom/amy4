@@ -1,0 +1,56 @@
+# 二进制文件 - 排除所有二进制文件
+*.exe
+*.bin
+
+# 排除所有 linux_* 二进制文件（但保留脚本）
+linux_*
+!**/*.sh
+!**/*.init
+!**/*.service
+!**/*.json
+
+# UPX 压缩的二进制文件目录
+**/upx/
+!**/upx/*.txt
+
+# 压缩包
+*.zip
+*.tar.gz
+*.7z
+*.gz
+
+# 其他大文件
+*.tar
+*.deb
+*.rpm
+*.ipk
+
+# 临时文件
+*.log
+*.out
+*.tmp
+
+# macOS
+.DS_Store
+
+# 特定目录中的二进制文件
+amy2024/linux_*
+amy2024/upx/linux_*
+Cns/linux_*
+Cns/windows_*.exe
+Cns/darwin_*
+Cns/freebsd_*
+v2ray5.3.0/v2ray-*
+xray1.8.4/xray-*
+ygk_v3.4/*
+
+# 但保留所有脚本和配置文件
+!**/*.sh
+!**/*.init
+!**/*.service
+!**/*.json
+!**/*.md
+!**/*.txt
+!**/*.yml
+!**/*.yaml
+

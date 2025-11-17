@@ -1,0 +1,16 @@
+[Unit]
+Description=v2ray - Project V
+Documentation=https://github.com/XTLS/v2ray-core
+ 
+[Service]
+Type=forking
+PIDFile=[v2ray_install_directory]/run.pid
+ExecStart=[v2ray_install_directory]/v2ray.init systemdStart
+ExecReload=[v2ray_install_directory]/v2ray.init systemdRestart
+ExecStop=[v2ray_install_directory]/v2ray.init stop
+PrivateTmp=true
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target
+
