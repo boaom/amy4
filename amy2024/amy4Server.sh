@@ -90,7 +90,7 @@ InstallFiles() {
 	binary_name="amy4Server-${amy4Server_UPX:+${amy4Server_UPX}-}linux-${machine}${softfloat}"
 	download_tool amy4Server "https://github.com/boaom/amy4/releases/latest/download/${binary_name}" || \
 	download_tool amy4Server "https://raw.githubusercontent.com/boaom/amy4/main/amy4Server/${amy4Server_UPX}/linux_${machine}${softfloat}" || Error "amy4Server download failed."
-	download_tool amy4Server.init https://raw.githubusercontent.com/boaom/amy4/main/amy4Server/amy4Server.init || Error "amy4Server.init download failed."
+	download_tool amy4Server.init https://raw.githubusercontent.com/boaom/amy4/main/amy2024/amy4Server.init || Error "amy4Server.init download failed."
 	[ -f '/etc/rc.common' ] && rcCommon='/etc/rc.common'
 	sed -i "s~#!/bin/sh~#!$SHELL $rcCommon~" amy4Server.init
 	sed -i "s~\[amy4Server_install_dir\]~$amy4Server_install_dir~g" amy4Server.init
@@ -111,7 +111,7 @@ InstallFiles() {
 	EOF
 	chmod -R +rwx "$amy4Server_install_dir" /etc/init.d/amy4Server
 	if type systemctl && [ -z "$(systemctl --failed|grep -q 'Host is down')" ]; then
-		download_tool /lib/systemd/system/amy4Server.service https://raw.githubusercontent.com/boaom/amy4/main/amy4Server/amy4Server.service || Error "amy4Server.service download failed."
+		download_tool /lib/systemd/system/amy4Server.service https://raw.githubusercontent.com/boaom/amy4/main/amy2024/amy4Server.service || Error "amy4Server.service download failed."
 		chmod +rwx /lib/systemd/system/amy4Server.service
 		sed -i "s~\[amy4Server_install_dir\]~$amy4Server_install_dir~g"  /lib/systemd/system/amy4Server.service
 		systemctl daemon-reload
