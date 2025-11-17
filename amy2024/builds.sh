@@ -152,7 +152,7 @@ amy4Server_set() {
 }
 
 tinyproxy_task() {
-	if $download_tool_cmd tinyproxy.sh https://raw.githubusercontent.com/boaom/amy4/main/tinyproxy/tinyproxy.sh; then
+	if $download_tool_cmd tinyproxy.sh https://raw.githubusercontent.com/boaom/amy4/main/amy2024/tinyproxy.sh; then
 		chmod 777 tinyproxy.sh
 		sed -i "s~#\!/bin/bash~#\!$SHELL~" tinyproxy.sh
 		./tinyproxy.sh $task_type && \
@@ -165,7 +165,7 @@ tinyproxy_task() {
 }
 
 cns_task() {
-	if $download_tool_cmd cns.sh https://raw.githubusercontent.com/boaom/amy4/main/cns/cns.sh; then
+	if $download_tool_cmd cns.sh https://raw.githubusercontent.com/boaom/amy4/main/Cns/cns.sh; then
 		chmod 777 cns.sh
 		sed -i "s~#\!/bin/bash~#\!$SHELL~" cns.sh
 		echo $echo_opt_e "n\ny\ny\ny\ny\n"|./cns.sh $task_type && \
@@ -178,7 +178,7 @@ cns_task() {
 }
 
 xray_task() {
-	if $download_tool_cmd xray.sh https://raw.githubusercontent.com/boaom/amy4/main/xray/xray.sh; then
+	if $download_tool_cmd xray.sh https://raw.githubusercontent.com/boaom/amy4/main/xray1.8.4/xray.sh; then
 		chmod 777 xray.sh
 		sed -i "s~#\!/bin/bash~#\!$SHELL~" xray.sh
 		echo $echo_opt_e "n\ny\ny\ny\ny\n"|./xray.sh $task_type && \
@@ -191,7 +191,7 @@ xray_task() {
 }
 
 amy4Server_task() {
-	if $download_tool_cmd amy4Server.sh https://raw.githubusercontent.com/boaom/amy4/main/amy4Server/amy4Server.sh; then
+	if $download_tool_cmd amy4Server.sh https://raw.githubusercontent.com/boaom/amy4/main/amy2024/amy4Server.sh; then
 		chmod 777 amy4Server.sh
 		sed -i "s~#\!/bin/bash~#\!$SHELL~" amy4Server.sh
 		echo $echo_opt_e "n"|./amy4Server.sh $task_type && \
